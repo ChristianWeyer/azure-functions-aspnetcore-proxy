@@ -10,15 +10,15 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using SampleWebApiAspNetCore;
 
-namespace WebApiProxyFunctionApp
+namespace AspNetCoreProxyFunctionApp
 {
-    public static class WebApiProxy
+    public static class AspNetCoreProxy
     {
         private static readonly HttpClient Client;
 
-        static WebApiProxy()
+        static AspNetCoreProxy()
         {
-            var functionPath = new FileInfo(typeof(WebApiProxy).Assembly.Location).Directory.Parent.FullName;
+            var functionPath = new FileInfo(typeof(AspNetCoreProxy).Assembly.Location).Directory.Parent.FullName;
             Directory.SetCurrentDirectory(functionPath);
             var server = CreateServer(functionPath);
             Client = server.CreateClient();
@@ -41,7 +41,7 @@ namespace WebApiProxyFunctionApp
                 .UseContentRoot(functionPath));
         }
 
-        [FunctionName("WebApiProxy")]
+        [FunctionName("Proxy")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(
                 AuthorizationLevel.Anonymous,
@@ -49,7 +49,7 @@ namespace WebApiProxyFunctionApp
                 Route = "{*x:regex(^(?!admin|debug|monitoring).*$)}")] HttpRequestMessage req,
             TraceWriter log)
         {
-            log.Info("***HTTP ASP.NET Core Web API Proxy: trigger function processed a request.");
+            log.Info("***HTTP trigger - ASP.NET Core Proxy: function processed a request.");
 
             var response = await Client.SendAsync(req);
 
