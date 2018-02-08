@@ -49,7 +49,7 @@ namespace WebApiProxyFunctionApp
                 Route = "{*x:regex(^(?!admin|debug|monitoring).*$)}")] HttpRequestMessage req,
             TraceWriter log)
         {
-            log.Info("C# HTTP trigger function processed a request.");
+            log.Info("***HTTP ASP.NET Core Web API Proxy: trigger function processed a request.");
 
             var response = await Client.SendAsync(req);
 
