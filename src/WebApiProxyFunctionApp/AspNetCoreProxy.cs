@@ -9,9 +9,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 
-//using SampleWebApiAspNetCore;
+using SampleWebApiAspNetCore;
 //using WhiteBoard;
-using WebApplication1;
 
 namespace AspNetCoreProxyFunctionApp
 {
@@ -41,7 +40,7 @@ namespace AspNetCoreProxyFunctionApp
                         .AddEnvironmentVariables();
                 })
                 .UseStartup<Startup>()
-                .UseContentRoot(functionPath));
+                .UseContentRoot(Path.Combine(functionPath)));
         }
 
         [FunctionName("Proxy")]
