@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace SampleWebApiAspNetCore.Services
+﻿namespace SampleWebApiAspNetCore.Services
 {
     public interface ISeedDataService
     {

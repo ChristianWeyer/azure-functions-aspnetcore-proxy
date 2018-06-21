@@ -1,8 +1,4 @@
-﻿using System;
-using SampleWebApiAspNetCore.Dtos;
-using SampleWebApiAspNetCore.Entities;
-using SampleWebApiAspNetCore.Repositories;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +10,12 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Serialization;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using SampleWebApiAspNetCore.Dtos;
+using SampleWebApiAspNetCore.Entities;
 using SampleWebApiAspNetCore.Middleware;
+using SampleWebApiAspNetCore.Repositories;
 using SampleWebApiAspNetCore.Services;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace SampleWebApiAspNetCore
 {
@@ -54,11 +51,19 @@ namespace SampleWebApiAspNetCore
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IUrlHelper>(implementationFactory =>
             {
-                var actionContext = implementationFactory.GetService<IActionContextAccessor>()
-                .ActionContext;
+                var actionContext = implementationFactory.GetService<IActionContextAccessor>().ActionContext;
                 return new UrlHelper(actionContext);
             });
 
+            services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddApiVersioning(config =>
+            {
+                config.ReportApiVersions = true;
+                config.AssumeDefaultVersionWhenUnspecified = true;
+                config.DefaultApiVersion = new ApiVersion(1, 0);
+                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            });
             services.AddSwaggerGen(
                 options =>
                 {
@@ -76,28 +81,13 @@ namespace SampleWebApiAspNetCore
                             });
                     }
                 });
-
-            services.AddApiVersioning(config =>
-             {
-                 config.ReportApiVersions = true;
-                 config.AssumeDefaultVersionWhenUnspecified = true;
-                 config.DefaultApiVersion = new ApiVersion(1, 0);
-                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-             });
-             
-            services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
-            services.AddMvc().AddJsonOptions(options =>
-            {
-                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            });
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
-            ILoggerFactory loggerFactory, IApiVersionDescriptionProvider provider)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory, 
+            IHostingEnvironment env, IApiVersionDescriptionProvider provider)
         {
-            loggerFactory.AddConsole();
+            //loggerFactory.AddConsole();
 
             if (env.IsDevelopment())
             {
@@ -105,6 +95,7 @@ namespace SampleWebApiAspNetCore
             }
             else
             {
+                app.UseHsts();
                 app.UseExceptionHandler(errorApp =>
                 {
                     errorApp.Run(async context =>
@@ -123,31 +114,31 @@ namespace SampleWebApiAspNetCore
                 });
             }
 
-            app.UseSwagger();
-
-            app.UseSwaggerUI(
-                    options =>
-                    {
-                        foreach (var description in provider.ApiVersionDescriptions)
-                        {
-                            options.SwaggerEndpoint(
-                                $"/swagger/{description.GroupName}/swagger.json",
-                                description.GroupName.ToUpperInvariant());
-                        }
-                    });
-
-            var foodRepository = app.ApplicationServices.GetRequiredService<IFoodRepository>();
             app.AddSeedData();
+
+            app.UseHttpsRedirection();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(
+                options =>
+                {
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        options.SwaggerEndpoint(
+                            $"/swagger/{description.GroupName}/swagger.json",
+                            description.GroupName.ToUpperInvariant());
+                    }
+                });
 
             app.UseCors("AllowAllOrigins");
             AutoMapper.Mapper.Initialize(mapper =>
-                      {
-                          mapper.CreateMap<FoodItem, FoodItemDto>().ReverseMap();
-                          mapper.CreateMap<FoodItem, FoodUpdateDto>().ReverseMap();
-                          mapper.CreateMap<FoodItem, FoodCreateDto>().ReverseMap();
-                      });
+            {
+                mapper.CreateMap<FoodItem, FoodItemDto>().ReverseMap();
+                mapper.CreateMap<FoodItem, FoodUpdateDto>().ReverseMap();
+                mapper.CreateMap<FoodItem, FoodCreateDto>().ReverseMap();
+            });
+
             app.UseMvc();
         }
-
     }
 }

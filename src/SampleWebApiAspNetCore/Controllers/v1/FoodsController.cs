@@ -9,14 +9,14 @@ using System.Collections.Generic;
 using SampleWebApiAspNetCore.Entities;
 using SampleWebApiAspNetCore.Models;
 using SampleWebApiAspNetCore.Helpers;
-using Microsoft.AspNetCore.Authorization;
 
-namespace SampleWebApiAspNetCore.Controllers
+namespace SampleWebApiAspNetCore.v1.Controllers
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    // [Route("api/[controller]")]
-    public class FoodsController : Controller
+    //[Route("api/[controller]")]
+    [ApiController]
+    public class FoodsController : ControllerBase
     {
         private readonly IFoodRepository _foodRepository;
         private readonly IUrlHelper _urlHelper;
@@ -28,7 +28,7 @@ namespace SampleWebApiAspNetCore.Controllers
         }
 
         [HttpGet(Name = nameof(GetAllFoods))]
-        public IActionResult GetAllFoods([FromQuery] QueryParameters queryParameters)
+        public ActionResult GetAllFoods([FromQuery] QueryParameters queryParameters)
         {
             List<FoodItem> foodItems = _foodRepository.GetAll(queryParameters).ToList();
 
@@ -58,7 +58,7 @@ namespace SampleWebApiAspNetCore.Controllers
 
         [HttpGet]
         [Route("{id:int}", Name = nameof(GetSingleFood))]
-        public IActionResult GetSingleFood(int id)
+        public ActionResult GetSingleFood(int id)
         {
             FoodItem foodItem = _foodRepository.GetSingle(id);
 
@@ -71,7 +71,7 @@ namespace SampleWebApiAspNetCore.Controllers
         }
 
         [HttpPost(Name = nameof(AddFood))]
-        public IActionResult AddFood([FromBody] FoodCreateDto foodCreateDto)
+        public ActionResult<FoodItemDto> AddFood([FromBody] FoodCreateDto foodCreateDto)
         {
             if (foodCreateDto == null)
             {
@@ -93,13 +93,13 @@ namespace SampleWebApiAspNetCore.Controllers
             }
 
             FoodItem newFoodItem = _foodRepository.GetSingle(toAdd.Id);
-            
+
             return CreatedAtRoute(nameof(GetSingleFood), new { id = newFoodItem.Id },
                 Mapper.Map<FoodItemDto>(newFoodItem));
         }
 
         [HttpPatch("{id:int}", Name = nameof(PartiallyUpdateFood))]
-        public IActionResult PartiallyUpdateFood(int id, [FromBody] JsonPatchDocument<FoodUpdateDto> patchDoc)
+        public ActionResult<FoodItemDto> PartiallyUpdateFood(int id, [FromBody] JsonPatchDocument<FoodUpdateDto> patchDoc)
         {
             if (patchDoc == null)
             {
@@ -136,7 +136,7 @@ namespace SampleWebApiAspNetCore.Controllers
 
         [HttpDelete]
         [Route("{id:int}", Name = nameof(RemoveFood))]
-        public IActionResult RemoveFood(int id)
+        public ActionResult RemoveFood(int id)
         {
             FoodItem foodItem = _foodRepository.GetSingle(id);
 
@@ -157,7 +157,7 @@ namespace SampleWebApiAspNetCore.Controllers
 
         [HttpPut]
         [Route("{id:int}", Name = nameof(UpdateFood))]
-        public IActionResult UpdateFood(int id, [FromBody]FoodUpdateDto foodUpdateDto)
+        public ActionResult<FoodItemDto> UpdateFood(int id, [FromBody]FoodUpdateDto foodUpdateDto)
         {
             if (foodUpdateDto == null)
             {
@@ -189,7 +189,7 @@ namespace SampleWebApiAspNetCore.Controllers
         }
 
         [HttpGet("GetRandomMeal", Name = nameof(GetRandomMeal))]
-        public IActionResult GetRandomMeal()
+        public ActionResult GetRandomMeal()
         {
             ICollection<FoodItem> foodItems = _foodRepository.GetRandomMeal();
 
@@ -255,6 +255,11 @@ namespace SampleWebApiAspNetCore.Controllers
                 }), "previous", "GET"));
             }
 
+            links.Add(
+               new LinkDto(_urlHelper.Link(nameof(AddFood), null),
+               "create_food",
+               "POST"));
+
             return links;
         }
 
@@ -294,17 +299,6 @@ namespace SampleWebApiAspNetCore.Controllers
                "PUT"));
 
             return links;
-        }
-    }
-
-    [ApiVersion("2.0")]
-    [Route("api/v{version:apiVersion}/foods")]
-    public class Foods2Controller : Controller
-    {
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok("2.0");
         }
     }
 }

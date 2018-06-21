@@ -8,9 +8,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
-
 using SampleWebApiAspNetCore;
-//using WhiteBoard;
 
 namespace AspNetCoreProxyFunctionApp
 {
@@ -48,7 +46,8 @@ namespace AspNetCoreProxyFunctionApp
             [HttpTrigger(
                 AuthorizationLevel.Anonymous,
                 "get", "post", "put", "patch", "options",
-                Route = "{*x:regex(^(?!admin|debug|monitoring).*$)}")] HttpRequestMessage req,
+                Route = "{*x:regex(^(?!admin|debug|monitoring).*$)}")]
+            HttpRequestMessage req,
             TraceWriter log)
         {
             log.Info("***HTTP trigger - ASP.NET Core Proxy: function processed a request.");
