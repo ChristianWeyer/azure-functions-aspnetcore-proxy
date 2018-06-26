@@ -4,7 +4,7 @@
       "commandName": "Executable",
       "executablePath": "C:\\Program Files\\dotnet\\dotnet.exe",
       "commandLineArgs": "%userprofile%\\AppData\\Roaming\\npm\\node_modules\\azure-functions-core-tools\\bin\\func.dll host start",
-      "workingDirectory": ".\\bin\\Debug\\netstandard2.0"
+      "workingDirectory": ".\\bin\\Release\\netstandard2.0"
     },
     "AspNetCoreProxyFunctionApp": {
       "commandName": "Project"

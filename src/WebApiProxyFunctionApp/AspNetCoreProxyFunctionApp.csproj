@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
@@ -11,21 +11,21 @@
   </PropertyGroup>
   <Target Name="CopyDepsFiles" AfterTargets="Build" Condition="'$(TargetFramework)'!=''">
     <ItemGroup>
-      <DepsFilePaths Include="$([System.IO.Path]::ChangeExtension('%(_ResolvedProjectReferencePaths.FullPath)', '.deps.json'))" />
+      <DepsFilePaths Include="$([System.IO.Path]::ChangeExtension('%(_ResolvedProjectReferencePaths.FullPath)', '.deps.json'))"/>
     </ItemGroup>
-
-    <Copy SourceFiles="%(DepsFilePaths.FullPath)" DestinationFolder="$(OutputPath)" Condition="Exists('%(DepsFilePaths.FullPath)')" />
+    <Copy SourceFiles="%(DepsFilePaths.FullPath)" DestinationFolder="$(OutputPath)" Condition="Exists('%(DepsFilePaths.FullPath)')"/>
   </Target>
   <ItemGroup>
-    <None Remove="rh13kkvc.akh~" />
+    <None Remove="rh13kkvc.akh~"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.1" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.14" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.1"/>
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.13"/>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2"/>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SampleWebApiAspNetCore\SampleWebApiAspNetCore.csproj" />
+    <ProjectReference Include="..\SampleWebApiAspNetCore\SampleWebApiAspNetCore.csproj"/>
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
