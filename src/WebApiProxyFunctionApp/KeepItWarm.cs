@@ -7,7 +7,10 @@ namespace AspNetCoreProxyFunctionApp
     public static class KeepItWarm
     {
         [FunctionName("KeepItWarm")]
-        public static void Run([TimerTrigger("0 */9 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static void Run(
+            [TimerTrigger("0 */8 * * * *")]
+            TimerInfo myTimer,
+            TraceWriter log)
         {
             log.Info($"C# Timer trigger function executed at: {DateTime.Now}");
         }
